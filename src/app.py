@@ -17,7 +17,9 @@ CORS(app)
 
 # Initialize database
 def init_db():
-    conn = sqlite3.connect('../data/court_data.db')
+    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'court_data.db')
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -163,7 +165,8 @@ def verify_case_data(case_type, case_number, filing_year):
 def get_query_history():
     """Get query history"""
     try:
-        conn = sqlite3.connect('../data/court_data.db')
+        db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'court_data.db')
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
         cursor.execute('''
@@ -193,7 +196,8 @@ def get_query_history():
 
 def log_query(case_type, case_number, filing_year, status, error_message=None):
     """Log query to database"""
-    conn = sqlite3.connect('../data/court_data.db')
+    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'court_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -208,7 +212,8 @@ def log_query(case_type, case_number, filing_year, status, error_message=None):
 
 def update_query_log(query_id, response_data, status, error_message=None):
     """Update query log with results"""
-    conn = sqlite3.connect('../data/court_data.db')
+    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'court_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -222,7 +227,8 @@ def update_query_log(query_id, response_data, status, error_message=None):
 
 def store_case_data(case_type, case_number, filing_year, case_data):
     """Store case data in database"""
-    conn = sqlite3.connect('../data/court_data.db')
+    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'court_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     cursor.execute('''

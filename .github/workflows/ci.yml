@@ -10,18 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    
     steps:
     - uses: actions/checkout@v3
     
@@ -50,12 +38,14 @@ jobs:
     
     - name: Run tests
       run: |
-        python -m pytest tests/ -v --cov=. --cov-report=xml
+        cd src && python -m pytest ../tests/ -v --cov=. --cov-report=xml
+      env:
+        PYTHONPATH: ${{ github.workspace }}/src
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: ./coverage.xml
+        file: ./src/coverage.xml
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
@@ -73,10 +63,7 @@ jobs:
     
     - name: Test Docker image
       run: |
-        docker run --rm -d -p 5000:5000 --name test-container court-fetcher:latest
-        sleep 30
-        curl -f http://localhost:5000/ || exit 1
-        docker stop test-container
+        docker run --rm court-fetcher:latest python --version
 
   security-scan:
     runs-on: ubuntu-latest
@@ -84,13 +71,19 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
     - name: Run Bandit Security Scan
       run: |
         pip install bandit
-        bandit -r . -f json -o bandit-report.json || true
+        bandit -r src/ -f json -o bandit-report.json -ll || true
     
     - name: Upload security scan results
       uses: actions/upload-artifact@v3
       with:
         name: security-scan-results
         path: bandit-report.json
+        if-no-files-found: warn

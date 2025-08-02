@@ -136,6 +136,10 @@ logs/
 data/
 chromedriver*
 geckodriver*
+Proof-*.png
+*.png
+*.jpg
+*.jpeg
 
 # IDE
 .vscode/
